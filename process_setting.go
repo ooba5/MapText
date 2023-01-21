@@ -4,6 +4,11 @@ import(
 )
 func main(){
 
-	fmt.Println("init")
+	text, err := ReadBook("path")
+
+	if err != nil{
+		fmt.Println(err)
+	}
+	fmt.Println(text)
 
 }
