@@ -5,6 +5,7 @@ import(
 	"bufio"
 	"github.com/jdkato/prose/v2"
 	"fmt"
+	"encoding/csv"
 )
 func ReadBook(path string) ([]string, error) {
 	book, err := os.Open(path) 
@@ -17,13 +18,13 @@ func ReadBook(path string) ([]string, error) {
 	for scn.Scan(){
 		lines = append(lines, scn.Text())
 	}
-
+	book.Close()
 	return lines, err
 }
 
 
 
-func ClassifySetting(text string, settings map[string]Setting, line int){
+func ClassifySetting(text string, settings map[string]Topic, line int){
 	doc, _ := prose.NewDocument(text)
     for _, ent := range doc.Entities() {
 		fmt.Println(ent.Text)
@@ -37,7 +38,7 @@ func ClassifySetting(text string, settings map[string]Setting, line int){
 				settings[ent.Text] = s
 			
 			case false:
-				s := Setting{ent.Text, 1, []int{line}}
+				s := Topic{ent.Text, 1, []int{line}}
 
 				settings[s.name] = s
 			}
@@ -46,9 +47,30 @@ func ClassifySetting(text string, settings map[string]Setting, line int){
 	}
 }
 
-type Setting struct {
+func ReadFoods(path string) (map[string]bool, error){
+	datafile,err := os.Open(path)
+	if err != nil{
+		return make(map[string]bool), err
+	}
+	csvReader := csv.NewReader(datafile)
+	
+    data, err := csvReader.ReadAll()
+	var all_foods = make(map[string]bool)
+	for _,fd := range data {
+		all_foods[fd[0]] = true
+	}
+	return all_foods, err
+
+}
+
+
+func ClassifyDining(text string, foods map[string]Topic, line int){
+
+}
+
+type Topic struct {
 	name string 
 	mentions int 
 	line_num []int
 }
-	
+
